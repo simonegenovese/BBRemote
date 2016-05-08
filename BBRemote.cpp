@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
     while (true) {
         Blynk.run();
-        Sleep(1000);
+        sleep(1000);
         Blynk.virtualWrite(3,getCPU());
         Blynk.virtualWrite(4,getMEM());
     }
