@@ -2,9 +2,9 @@
 // Created by Simone Genovese on 08/05/16.
 //
 
-#include "blynk-library/linux/BlynkApiWiringPi.h"
-#include "blynk-library/linux/BlynkSocket.h"
-#include "blynk-library/linux/BlynkOptionsParser.h"
+#include "BlynkApiWiringPi.h"
+#include "BlynkSocket.h"
+#include "BlynkOptionsParser.h"
 
 static BlynkTransportSocket _blynkTransport;
 BlynkSocket Blynk(_blynkTransport);
