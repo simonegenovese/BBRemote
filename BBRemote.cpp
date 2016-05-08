@@ -5,6 +5,7 @@
 #include "BlynkApiWiringPi.h"
 #include "BlynkSocket.h"
 #include "BlynkOptionsParser.h"
+#include <unistd.h>
 
 static BlynkTransportSocket _blynkTransport;
 BlynkSocket Blynk(_blynkTransport);
