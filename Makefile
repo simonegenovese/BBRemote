@@ -45,7 +45,7 @@ else
 endif
 
 ifeq ($(target),raspberry)
-	CFLAGS += -DRASPBERRY
+	CFLAGS += -DRASPBERRY -lgtop-2.0
 	LDFLAGS += -lwiringPi
 endif
 

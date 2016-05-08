@@ -15,6 +15,7 @@ BlynkSocket Blynk(_blynkTransport);
 #include <time.h>
 #include <glibtop/cpu.h>
 #include <unistd.h>
+using namespace std;
 
 float // Get CPU usge as a decimal percentage.
 get_cpu(glibtop_cpu *cpustruct) {
