@@ -45,8 +45,8 @@ else
 endif
 
 ifeq ($(target),raspberry)
-	CFLAGS += -DRASPBERRY -lgtop-2.0
-	LDFLAGS += -lwiringPi
+	CFLAGS += -DRASPBERRY
+	LDFLAGS += -lwiringPi -lgtop-2.0
 endif
 
 SOURCES=BBRemote.cpp \
