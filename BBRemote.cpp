@@ -92,7 +92,8 @@ BLYNK_WRITE(V1) {
         printf ("The temperature is %6.3f C.\n", T);
         fclose (temperature);
         Blynk.virtualWrite(0, T);
-
+        Blynk.virtualWrite(3,getCPU());
+        Blynk.virtualWrite(4,getMEM());
 }
 
 BLYNK_WRITE(V2) {
@@ -110,9 +111,6 @@ int main(int argc, char *argv[]) {
 
     while (true) {
         Blynk.run();
-        sleep(1000);
-        Blynk.virtualWrite(3,getCPU());
-        Blynk.virtualWrite(4,getMEM());
     }
 }
 
