@@ -50,7 +50,7 @@ ifeq ($(target),raspberry)
 endif
 
 SOURCES=BBRemote.cpp \
-	blynk-library/linux/BlynkDebug.cpp \
+	BlynkDebug.cpp \
 	blynk-library/utility/BlynkHandlers.cpp
 
 OBJECTS=$(SOURCES:.cpp=.o)
