@@ -11,18 +11,15 @@ BlynkSocket Blynk(_blynkTransport);
 
 #include "blynk-library/BlynkWidgets.h"
 
-int GetCPULoad() {
-    int FileHandler;
-    char FileBuffer[1024];
-    float load;
+#include <stdio.h>
+#include <time.h>
+#include <glibtop/cpu.h>
+#include <unistd.h>
 
-    FileHandler = open("/proc/loadavg", O_RDONLY);
-    if(FileHandler < 0) {
-        return -1; }
-    read(FileHandler, FileBuffer, sizeof(FileBuffer) - 1);
-    sscanf(FileBuffer, "%f", &load);
-    close(FileHandler);
-    return (int)(load * 100);
+float // Get CPU usge as a decimal percentage.
+get_cpu(glibtop_cpu *cpustruct) {
+    glibtop_get_cpu(cpustruct);
+    return 100 - (float)cpustruct->idle / (float)cpustruct->total * 100;
 }
 
 BLYNK_WRITE(V1) {
@@ -37,7 +34,8 @@ BLYNK_WRITE(V1) {
         printf ("The temperature is %6.3f C.\n", T);
         fclose (temperature);
         Blynk.virtualWrite(0, T);
-        Blynk.virtualWrite(3,GetCPULoad());
+        glibtop_cpu cpustruct;
+        Blynk.virtualWrite(3,get_cpu(&cpustruct));
 }
 
 BLYNK_WRITE(V2) {
