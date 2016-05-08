@@ -7,7 +7,7 @@
 #
 
 CC = g++
-CFLAGS  = -I ../ -I ./ -I ./blynk-library/ -DLINUX
+CFLAGS  = -I ../ -I ./ -I ./blynk-library/ -I/usr/include/libgtop-2.0 -I/usr/include/glib-2.0 -DLINUX
 LDFLAGS = -lrt -lpthread
 
 ifeq ($(build),debug)
