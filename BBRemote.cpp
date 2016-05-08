@@ -11,7 +11,13 @@ BlynkSocket Blynk(_blynkTransport);
 
 #include "blynk-library/BlynkWidgets.h"
 
+#include <iostream>
+#include <sys/sysinfo.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include "stdio.h"
 #include <time.h>
 #include <glibtop/cpu.h>
 #include <unistd.h>
