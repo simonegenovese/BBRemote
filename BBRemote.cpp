@@ -13,6 +13,16 @@ BlynkSocket Blynk(_blynkTransport);
 
 BLYNK_WRITE(V1) {
         printf("Got a value: %s\n", param[0].asStr());
+        FILE *temperature;
+        double T;
+        temperatureFile = fopen ("/sys/class/thermal/thermal_zone0/temp", "r");
+        if (temperatureFile == NULL)
+        ; //print some message
+        fscanf (temperatureFile, "%lf", &T);
+        T /= 1000;
+        printf ("The temperature is %6.3f C.\n", T);
+        fclose (temperatureFile);
+        Blynk.virtualWrite(0, T);
 }
 
 BLYNK_WRITE(V2) {
