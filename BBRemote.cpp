@@ -11,6 +11,20 @@ BlynkSocket Blynk(_blynkTransport);
 
 #include "blynk-library/BlynkWidgets.h"
 
+int GetCPULoad() {
+    int FileHandler;
+    char FileBuffer[1024];
+    float load;
+
+    FileHandler = open("/proc/loadavg", O_RDONLY);
+    if(FileHandler < 0) {
+        return -1; }
+    read(FileHandler, FileBuffer, sizeof(FileBuffer) - 1);
+    sscanf(FileBuffer, "%f", &load);
+    close(FileHandler);
+    return (int)(load * 100);
+}
+
 BLYNK_WRITE(V1) {
         printf("Got a value: %s\n", param[0].asStr());
         FILE *temperature;
@@ -23,12 +37,15 @@ BLYNK_WRITE(V1) {
         printf ("The temperature is %6.3f C.\n", T);
         fclose (temperature);
         Blynk.virtualWrite(0, T);
+        Blynk.virtualWrite(3,GetCPULoad());
 }
 
 BLYNK_WRITE(V2) {
         printf("Reboot: %s\n", param[0].asStr());
         system("init 6");
 }
+
+
 
 int main(int argc, char *argv[]) {
     const char *auth, *serv, *port;
