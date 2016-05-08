@@ -15,12 +15,62 @@ BlynkSocket Blynk(_blynkTransport);
 #include <time.h>
 #include <glibtop/cpu.h>
 #include <unistd.h>
+#include <glibtop.h>
+#include <glibtop/mem.h>
 using namespace std;
+/* last total cpu time */
+guint64 cpu_total_time_last_;
+guint64 cpu_used_time_last_;
 
-float // Get CPU usge as a decimal percentage.
-get_cpu(glibtop_cpu *cpustruct) {
-    glibtop_get_cpu(cpustruct);
-    return 100 - (float)cpustruct->idle / (float)cpustruct->total * 100;
+/* last io bytes */
+long read_bytes_last_;
+long write_bytes_last_;
+
+/* nubmer of cpu */
+guint64 ncpu_;
+
+unsigned long getMEM()
+{
+
+    glibtop_init();
+    glibtop_mem memory;
+    glibtop_get_mem(&memory);
+
+
+
+    return (unsigned long)(memory.cached + memory.buffer + memory.free) * 100/memory.total;
+}
+
+
+float getCPU()
+{
+
+    /* initial glibtop_cpu data */
+    glibtop_cpu cpu;
+    glibtop_get_cpu (&cpu);
+
+    if (!cpu_total_time_last_){
+        cpu_total_time_last_ = cpu.total;
+        cpu_used_time_last_  = cpu.user + cpu.nice + cpu.sys;
+        return 0.0;
+    }
+
+    /* get system load */
+    float load;
+    float total, used;
+
+    total = cpu.total - cpu_total_time_last_;
+    used  = cpu.user + cpu.nice + cpu.sys - cpu_used_time_last_;
+    cpu_total_time_last_ = cpu.total;
+    cpu_used_time_last_  = cpu.user + cpu.nice + cpu.sys;
+
+    load  = 100 * used / max(total, 1.0f);
+    load  = min (load, 100.0f);
+
+    return load;
+
+
+
 }
 
 BLYNK_WRITE(V1) {
@@ -35,8 +85,8 @@ BLYNK_WRITE(V1) {
         printf ("The temperature is %6.3f C.\n", T);
         fclose (temperature);
         Blynk.virtualWrite(0, T);
-        glibtop_cpu cpustruct;
-        Blynk.virtualWrite(3,get_cpu(&cpustruct));
+        Blynk.virtualWrite(3,getCPU());
+        Blynk.virtualWrite(4,getMEM());
 }
 
 BLYNK_WRITE(V2) {
