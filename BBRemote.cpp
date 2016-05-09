@@ -13,6 +13,9 @@ BlynkSocket Blynk(_blynkTransport);
 #include "blynk-library/BlynkWidgets.h"
 
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <functional>
 #include <sys/sysinfo.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -35,6 +38,20 @@ long write_bytes_last_;
 
 /* nubmer of cpu */
 guint64 ncpu_;
+
+void timer_start(std::function<void(void)> func, unsigned int interval)
+{
+    std::thread([func, interval]() {
+        while (true)
+        {
+            func();
+            std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+        }
+    }).detach();
+}
+
+
+
 
 unsigned long getMEM()
 {
@@ -80,6 +97,16 @@ float getCPU()
 
 }
 
+void do_something()
+{
+    float cpu = getCPU();
+    unsigned long mem = getMEM();
+    Blynk.virtualWrite(3,cpu);
+    Blynk.virtualWrite(4,mem);
+    printf ("The CPU is %f \n", cpu);
+    printf ("The memory is %d \n", mem);
+}
+
 BLYNK_WRITE(V1) {
         printf("Got a value: %s\n", param[0].asStr());
         FILE *temperature;
@@ -92,8 +119,6 @@ BLYNK_WRITE(V1) {
         printf ("The temperature is %6.3f C.\n", T);
         fclose (temperature);
         Blynk.virtualWrite(0, T);
-        Blynk.virtualWrite(3,getCPU());
-        Blynk.virtualWrite(4,getMEM());
 }
 
 BLYNK_WRITE(V2) {
@@ -108,6 +133,8 @@ int main(int argc, char *argv[]) {
     parse_options(argc, argv, auth, serv, port);
 
     Blynk.begin(auth, serv, port);
+
+    timer_start(do_something, 1000);
 
     while (true) {
         Blynk.run();
