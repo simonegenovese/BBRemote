@@ -27,6 +27,7 @@ BlynkSocket Blynk(_blynkTransport);
 #include <unistd.h>
 #include <glibtop.h>
 #include <glibtop/mem.h>
+
 using namespace std;
 /* last total cpu time */
 guint64 cpu_total_time_last_;
@@ -35,15 +36,13 @@ guint64 cpu_used_time_last_;
 /* last io bytes */
 long read_bytes_last_;
 long write_bytes_last_;
-
+double T;
 /* nubmer of cpu */
 guint64 ncpu_;
 
-void timer_start(std::function<void(void)> func, unsigned int interval)
-{
+void timer_start(std::function<void(void)> func, unsigned int interval) {
     std::thread([func, interval]() {
-        while (true)
-        {
+        while (true) {
             func();
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         }
@@ -51,31 +50,26 @@ void timer_start(std::function<void(void)> func, unsigned int interval)
 }
 
 
-
-
-unsigned long getMEM()
-{
+unsigned long getMEM() {
 
     glibtop_init();
     glibtop_mem memory;
     glibtop_get_mem(&memory);
 
 
-
-    return (unsigned long)(memory.cached + memory.buffer + memory.free) * 100/memory.total;
+    return (unsigned long) (memory.cached + memory.buffer + memory.free) * 100 / memory.total;
 }
 
 
-float getCPU()
-{
+float getCPU() {
 
     /* initial glibtop_cpu data */
     glibtop_cpu cpu;
-    glibtop_get_cpu (&cpu);
+    glibtop_get_cpu(&cpu);
 
-    if (!cpu_total_time_last_){
+    if (!cpu_total_time_last_) {
         cpu_total_time_last_ = cpu.total;
-        cpu_used_time_last_  = cpu.user + cpu.nice + cpu.sys;
+        cpu_used_time_last_ = cpu.user + cpu.nice + cpu.sys;
         return 0.0;
     }
 
@@ -84,40 +78,43 @@ float getCPU()
     float total, used;
 
     total = cpu.total - cpu_total_time_last_;
-    used  = cpu.user + cpu.nice + cpu.sys - cpu_used_time_last_;
+    used = cpu.user + cpu.nice + cpu.sys - cpu_used_time_last_;
     cpu_total_time_last_ = cpu.total;
-    cpu_used_time_last_  = cpu.user + cpu.nice + cpu.sys;
+    cpu_used_time_last_ = cpu.user + cpu.nice + cpu.sys;
 
-    load  = 100 * used / max(total, 1.0f);
-    load  = min (load, 100.0f);
+    load = 100 * used / max(total, 1.0f);
+    load = min(load, 100.0f);
 
     return load;
 
 
-
 }
 
-void do_something()
-{
+double getTemp() {
+    FILE *temperature;
+    double T;
+    temperature = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+    if (temperature == NULL); //print some message
+    fscanf(temperature, "%lf", &T);
+    T /= 1000;
+    fclose(temperature);
+    return T;
+}
+
+void do_something() {
     float cpu = getCPU();
     unsigned long mem = getMEM();
-    Blynk.virtualWrite(3,cpu);
-    Blynk.virtualWrite(4,mem);
-    printf ("The CPU is %f \n", cpu);
-    printf ("The memory is %d \n", mem);
+    double temp = getTemp();
+    Blynk.virtualWrite(3, cpu);
+    Blynk.virtualWrite(4, mem);
+    Blynk.virtualWrite(0, temp);
+    // printf ("The CPU is %f \n", cpu);
+    // printf ("The memory is %d \n", mem);
 }
 
 BLYNK_WRITE(V1) {
         printf("Got a value: %s\n", param[0].asStr());
-        FILE *temperature;
-        double T;
-        temperature = fopen ("/sys/class/thermal/thermal_zone0/temp", "r");
-        if (temperature == NULL)
-        ; //print some message
-        fscanf (temperature, "%lf", &T);
-        T /= 1000;
-        printf ("The temperature is %6.3f C.\n", T);
-        fclose (temperature);
+        double T = getTemp();
         Blynk.virtualWrite(0, T);
 }
 
@@ -127,14 +124,13 @@ BLYNK_WRITE(V2) {
 }
 
 
-
 int main(int argc, char *argv[]) {
     const char *auth, *serv, *port;
     parse_options(argc, argv, auth, serv, port);
 
     Blynk.begin(auth, serv, port);
 
-    timer_start(do_something, 1000);
+    timer_start(do_something, 2000);
 
     while (true) {
         Blynk.run();
