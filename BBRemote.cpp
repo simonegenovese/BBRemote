@@ -27,6 +27,9 @@ BlynkSocket Blynk(_blynkTransport);
 #include <glibtop/mem.h>
 
 using namespace std;
+/* last total cpu time */
+guint64 cpu_total_time_last_;
+guint64 cpu_used_time_last_;
 
 
 
