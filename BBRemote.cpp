@@ -5,6 +5,10 @@
 #include "blynk-library/linux/BlynkApiWiringPi.h"
 #include "blynk-library/linux/BlynkSocket.h"
 #include "blynk-library/linux/BlynkOptionsParser.h"
+
+static BlynkTransportSocket _blynkTransport;
+BlynkSocket Blynk(_blynkTransport);
+
 #include "blynk-library/BlynkWidgets.h"
 #include <iostream>
 #include <chrono>
@@ -25,8 +29,6 @@
 using namespace std;
 
 
-static BlynkTransportSocket _blynkTransport;
-BlynkSocket Blynk(_blynkTransport);
 
 void timer_start(std::function<void(void)> func, unsigned int interval) {
     std::thread([func, interval]() {
