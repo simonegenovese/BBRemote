@@ -8,7 +8,7 @@
 
 CC = g++
 CFLAGS  = -I ../ -I ./ -I ./blynk-library/ -I/usr/include/libgtop-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/glib-2.0 -DLINUX
-LDFLAGS = -lrt -lpthread --std=c++11
+LDFLAGS = -lrt -lpthread
 
 ifeq ($(build),debug)
 	CFLAGS += -c -g2 -O0 \
@@ -45,7 +45,7 @@ else
 endif
 
 ifeq ($(target),raspberry)
-	CFLAGS += -DRASPBERRY
+	CFLAGS += -DRASPBERRY --std=c++11
 	LDFLAGS += -lwiringPi -lgtop-2.0
 endif
 
