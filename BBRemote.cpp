@@ -106,9 +106,11 @@ BLYNK_WRITE(V2) {
 
 
 int main(int argc, char *argv[]) {
+    printf("Starting raspBlynk\n");
     const char *auth, *serv, *port;
     parse_options(argc, argv, auth, serv, port);
 
+    printf("Connecting...\n");
     Blynk.begin(auth, serv, port);
 
     timer_start(updateBlynk, 2000);
